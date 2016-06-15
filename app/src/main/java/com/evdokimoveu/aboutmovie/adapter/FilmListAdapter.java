@@ -42,19 +42,22 @@ public class FilmListAdapter extends BaseAdapter{
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView;
+        View view;
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         if (convertView == null) {
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.film_item, parent);
+            view = new View(context);
+            view = inflater.inflate(R.layout.film_item, null);
+            ImageView imageView = (ImageView) view.findViewById(R.id.image_item);
+            FilmPoster film = (FilmPoster)this.getItem(position);
+            String imagePath = film.getPosterPath();
+            Picasso.with(context).load(TheMoveDBConfig.IMG_URL + context.getResources().getString(R.string.img_size) + imagePath).into(imageView);
+            imageView.setId(position);
+        }
+        else{
+            view = convertView;
         }
 
-        imageView = (ImageView) convertView.findViewById(R.id.image_item);
-        FilmPoster film = (FilmPoster)this.getItem(position);
-        String imagePath = film.getPosterPath();
-        Picasso.with(context).load(TheMoveDBConfig.IMG_URL + context.getResources().getString(R.string.img_size) + imagePath).into(imageView);
-        imageView.setId(position);
-
-        return imageView;
+        return view;
     }
 }
