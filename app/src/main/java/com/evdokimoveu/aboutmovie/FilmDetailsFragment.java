@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 public class FilmDetailsFragment extends Fragment {
 
 
-    private int filmId;
+    private long filmId;
 
     public FilmDetailsFragment() {
     }
@@ -39,7 +39,7 @@ public class FilmDetailsFragment extends Fragment {
         super.onDetach();
     }
 
-    public void setFilmId(int filmId) {
+    public void setFilmId(long filmId) {
         this.filmId = filmId;
     }
 }
