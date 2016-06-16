@@ -2,12 +2,14 @@ package com.evdokimoveu.aboutmovie;
 
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import com.evdokimoveu.aboutmovie.adapter.FilmListAdapter;
 import com.evdokimoveu.aboutmovie.entity.FilmPoster;
@@ -34,6 +36,7 @@ public class MainWindowActivity extends AppCompatActivity implements FilmListFra
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_window);
+
         filmPosters = new ArrayList<>();
         if(savedInstanceState != null){
 
@@ -97,25 +100,41 @@ public class MainWindowActivity extends AppCompatActivity implements FilmListFra
 
             try {
                 JSONObject object = new JSONObject(strJson);
-                JSONArray array = object.getJSONArray("results");
-                for(int i = 0; i < array.length(); i++){
-                    JSONObject filmObject = array.getJSONObject(i);
-                    FilmPoster poster = new FilmPoster(
-                            filmObject.getLong("id"),
-                            filmObject.getString("poster_path")
-                    );
-                    filmPosters.add(poster);
+                if(object.has("status_code")){
+                    String codeMessage = object.getString("status_message");
+
+                    TextView textView = new TextView(MainWindowActivity.this);
+                    textView.setText(codeMessage);
+                    textView.setLayoutParams(new FrameLayout.LayoutParams(
+                            FrameLayout.LayoutParams.WRAP_CONTENT,
+                            FrameLayout.LayoutParams.WRAP_CONTENT));
+
+                    FrameLayout layout = (FrameLayout) findViewById(R.id.films_container);
+                    if(layout != null){
+                        layout.addView(textView);
+                    }
                 }
-                gridView = (GridView) findViewById(R.id.film_grid_view);
-                if(gridView != null){
-                    final FilmListAdapter adapter = new FilmListAdapter(filmPosters, MainWindowActivity.this);
-                    gridView.setAdapter(adapter);
-                    gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            onClick(adapter.getItemId((position)));
-                        }
-                    });
+                else{
+                    JSONArray array = object.getJSONArray("results");
+                    for(int i = 0; i < array.length(); i++){
+                        JSONObject filmObject = array.getJSONObject(i);
+                        FilmPoster poster = new FilmPoster(
+                                filmObject.getLong("id"),
+                                filmObject.getString("poster_path")
+                        );
+                        filmPosters.add(poster);
+                    }
+                    gridView = (GridView) findViewById(R.id.film_grid_view);
+                    if(gridView != null){
+                        final FilmListAdapter adapter = new FilmListAdapter(filmPosters, MainWindowActivity.this);
+                        gridView.setAdapter(adapter);
+                        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                onClick(adapter.getItemId((position)));
+                            }
+                        });
+                    }
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
